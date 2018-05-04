@@ -1,0 +1,5 @@
+--recursive
+--reporter spec
+--colors
+--check-leaks
+--timeout 5000
