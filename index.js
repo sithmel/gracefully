@@ -14,6 +14,7 @@ function gracefully (shutdownFunction, options) {
   options = Object.assign({}, defaults, options)
   const logger = options.logger
   const customEvent = options.customEvent
+  const handleExceptions = options.handleExceptions
 
   function shutDown (reason, code) {
     logger(`Received ${reason}. Attempting to shutdown gracefully.`)
@@ -27,10 +28,14 @@ function gracefully (shutdownFunction, options) {
     }
     process.removeListener('SIGINT', sigintListener)
     process.removeListener('SIGTERM', sigtermListener)
+    if (handleExceptions) {
+      process.removeListener('uncaughtException', uncaughtExceptionListener)
+      process.removeListener('unhandledRejection', unhandledRejectionListener)
+    }
 
     const timeout = timeoutMessage(options.stopWindow, `Graceful shutdown took more than stop window (${options.stopWindow} ms). Terminating process.`)
 
-    return Promise.race([shutdownFunction(), timeout])
+    return Promise.race([shutdownFunction(reason), timeout])
       .then((message) => {
         if (typeof message === 'string') {
           logger(message)
@@ -48,6 +53,8 @@ function gracefully (shutdownFunction, options) {
   }
 
   const stopListener = (payload) => shutDown(`'${customEvent}'`, payload && payload.code)
+  const uncaughtExceptionListener = (err) => shutDown('uncaughtException', 1)
+  const unhandledRejectionListener = (err) => shutDown('unhandledRejection', 1)
   const sigintListener = shutDown.bind(null, 'SIGINT', undefined)
   const sigtermListener = shutDown.bind(null, 'SIGTERM', undefined)
 
@@ -56,6 +63,10 @@ function gracefully (shutdownFunction, options) {
   }
   process.once('SIGINT', sigintListener)
   process.once('SIGTERM', sigtermListener)
+  if (handleExceptions) {
+    process.once('uncaughtException',uncaughtExceptionListener)
+    process.once('unhandledRejection',unhandledRejectionListener)
+  }
 }
 
 module.exports = gracefully

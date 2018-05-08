@@ -4,9 +4,9 @@
   "description": "Stops a node server gracefully",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/*.js",
+    "test": "mocha test/*.js",
     "watch": "npm run test -- -w",
-    "lint": "eslint --fix --ext .js ./src ./tests",
+    "lint": "eslint --fix --ext .js ./src ./test",
     "release:major": "npm-release major",
     "release:minor": "npm-release minor",
     "release:patch": "npm-release patch",
