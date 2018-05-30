@@ -1,6 +1,6 @@
 {
   "name": "gracefully",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Utilities to stop a node server gracefully",
   "main": "index.js",
   "scripts": {
