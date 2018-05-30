@@ -1,8 +1,8 @@
 /* eslint-env node, mocha */
-const gracefully = require('..')
+const onTerminate = require('../onTerminate')
 const assert = require('chai').assert
 
-describe('gracefully', function () {
+describe('onTerminate', function () {
   const quickOpts = {
     exitDelay: 1,
     stopWindow: 5,
@@ -49,7 +49,7 @@ describe('gracefully', function () {
         done()
       }
 
-      gracefully(shutdown, quickOpts)
+      onTerminate(shutdown, quickOpts)
       process.emit('custom-stop', { code: requestedCode })
     })
 
@@ -59,7 +59,7 @@ describe('gracefully', function () {
         done()
       }
 
-      gracefully(() => Promise.reject(new Error('Boom!')), quickOpts)
+      onTerminate(() => Promise.reject(new Error('Boom!')), quickOpts)
       process.emit('custom-stop', { code: 2 })
     })
   })
@@ -73,7 +73,7 @@ describe('gracefully', function () {
           done()
         }
 
-        gracefully(shutdown, quickOpts)
+        onTerminate(shutdown, quickOpts)
         process.emit(signal)
       })
 
@@ -83,7 +83,7 @@ describe('gracefully', function () {
           done()
         }
 
-        gracefully(shutdownLong, quickOpts)
+        onTerminate(shutdownLong, quickOpts)
         process.emit(signal)
       })
 
@@ -92,7 +92,7 @@ describe('gracefully', function () {
           assert.strictEqual(code, 1)
           done()
         }
-        gracefully(() => Promise.reject(new Error('Boom!')), quickOpts)
+        onTerminate(() => Promise.reject(new Error('Boom!')), quickOpts)
         process.emit(signal)
       })
     })
