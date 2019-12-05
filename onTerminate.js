@@ -53,8 +53,14 @@ function onTerminate (shutdownFunction, options) {
   }
 
   const stopListener = (payload) => shutDown(`'${customEvent}'`, payload && payload.code)
-  const uncaughtExceptionListener = (err) => shutDown('uncaughtException', 1)
-  const unhandledRejectionListener = (err) => shutDown('unhandledRejection', 1)
+  const uncaughtExceptionListener = (err) => {
+    console.error(err)
+    shutDown('uncaughtException', 1)
+  }
+  const unhandledRejectionListener = (err) => {
+    console.error(err)
+    shutDown('unhandledRejection', 1)
+  }
   const sigintListener = shutDown.bind(null, 'SIGINT', undefined)
   const sigtermListener = shutDown.bind(null, 'SIGTERM', undefined)
 
@@ -64,8 +70,8 @@ function onTerminate (shutdownFunction, options) {
   process.once('SIGINT', sigintListener)
   process.once('SIGTERM', sigtermListener)
   if (handleExceptions) {
-    process.once('uncaughtException',uncaughtExceptionListener)
-    process.once('unhandledRejection',unhandledRejectionListener)
+    process.once('uncaughtException', uncaughtExceptionListener)
+    process.once('unhandledRejection', unhandledRejectionListener)
   }
 }
 

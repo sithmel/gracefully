@@ -1,11 +1,11 @@
 const uuid = require('uuid/v1')
 
-function Runner() {
+function Runner () {
   this._isShuttingDown = false
   this.running = {}
 }
 
-Runner.prototype.wrap = function runner_wrap (func) {
+Runner.prototype.wrap = function runnerWrap (func) {
   const runner = this
 
   return function (...args) {
@@ -28,21 +28,21 @@ Runner.prototype.wrap = function runner_wrap (func) {
   }
 }
 
-Runner.prototype.shutdown = function runner_shutdown () {
+Runner.prototype.shutdown = function runnerShutdown () {
   this._isShuttingDown = true
 
   return Promise.all(Object.keys(this.running)
     .map((key) => this.running[key].catch(() => Promise.resolve(null))))
 }
 
-Runner.prototype.flush = function runner_flush () {
+Runner.prototype.flush = function runnerFlush () {
   this.shutdown()
     .then(() => {
       this._isShuttingDown = false
     })
 }
 
-Runner.prototype.length = function runner_length () {
+Runner.prototype.length = function runnerLength () {
   return Object.keys(this.running).length
 }
 
