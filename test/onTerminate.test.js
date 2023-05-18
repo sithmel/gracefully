@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { describe, it, beforeEach, afterEach } = require("zunit");
+const { describe, it, beforeEach, afterEach, oit } = require("zunit");
 const onTerminate = require("../index.js");
 
 describe("onTerminate", function () {
@@ -40,11 +40,11 @@ describe("onTerminate", function () {
   });
 
   describe("'custom-stop' handling", () => {
-    it("stops system gracefully", (done) => {
+    it("stops system gracefully", (_test, done) => {
       const requestedCode = 2;
 
       process.exit = function (code) {
-        assert.strictEqual(code, requestedCode);
+        assert.equal(code, requestedCode);
         assert(!started);
         done();
       };
@@ -53,22 +53,57 @@ describe("onTerminate", function () {
       process.emit("custom-stop", { code: requestedCode });
     });
 
-    it("terminates system when graceful shutdown fails", (done) => {
+    it("terminates system when graceful shutdown fails", (_test, done) => {
       process.exit = function (code) {
-        assert.strictEqual(code, 1);
+        assert.equal(code, 1);
         done();
       };
 
       onTerminate(() => Promise.reject(new Error("Boom!")), quickOpts);
       process.emit("custom-stop", { code: 2 });
     });
+
+    it("calls onErrorTerminate", (_test, done) => {
+      let errorMessage;
+      process.exit = function (code) {
+        assert.equal(errorMessage, "Boom!");
+        assert.equal(code, 1);
+        done();
+      };
+
+      onTerminate(() => Promise.reject(new Error("Boom!")), {
+        ...quickOpts,
+        onError: (err) => (errorMessage = err.message),
+      });
+      process.emit("custom-stop", { code: 2 });
+    });
+
+    it("calls onBeforeTerminate", (_test, done) => {
+      let called = false;
+      const requestedCode = 2;
+
+      process.exit = function (code) {
+        assert.equal(called, true);
+        assert.equal(code, requestedCode);
+        assert(!started);
+        done();
+      };
+
+      onTerminate(shutdown, {
+        ...quickOpts,
+        onBeforeTerminate: () => {
+          called = true;
+        },
+      });
+      process.emit("custom-stop", { code: requestedCode });
+    });
   });
 
   Array.from(["SIGINT", "SIGTERM"]).forEach(function (signal) {
     describe(signal + " handling", function () {
-      it("stops system gracefully", (done) => {
+      it("stops system gracefully", (_test, done) => {
         process.exit = function (code) {
-          assert.isUndefined(code);
+          assert.equal(code, undefined);
           assert(!started);
           done();
         };
@@ -77,9 +112,9 @@ describe("onTerminate", function () {
         process.emit(signal);
       });
 
-      it("terminates system when not shut down gracefully in stop window", (done) => {
+      it("terminates system when not shut down gracefully in stop window", (_test, done) => {
         process.exit = function (code) {
-          assert.isUndefined(code);
+          assert.equal(code, undefined);
           done();
         };
 
@@ -87,9 +122,9 @@ describe("onTerminate", function () {
         process.emit(signal);
       });
 
-      it("terminates system when graceful shutdown fails", (done) => {
+      it("terminates system when graceful shutdown fails", (_test, done) => {
         process.exit = function (code) {
-          assert.strictEqual(code, 1);
+          assert.equal(code, 1);
           done();
         };
         onTerminate(() => Promise.reject(new Error("Boom!")), quickOpts);

@@ -4,7 +4,7 @@ const DEFAULTS = {
   customEvent: null,
   handleExceptions: false,
   onBeforeTerminate: () => {},
-  onErrorTerminate: () => {},
+  onError: () => {},
 };
 
 function timeoutMessage(tm, message) {
@@ -17,12 +17,11 @@ function onTerminate(shutdown, options) {
   const {
     exitDelay,
     stopWindow,
-    onErrorTerminate,
+    onError,
     onBeforeTerminate,
     customEvent,
     handleExceptions,
-  } = { ...DEFAULTS, options };
-
+  } = { ...DEFAULTS, ...options };
   const exitSoon = (code) => {
     setTimeout(() => process.exit(code), exitDelay).unref();
   };
@@ -43,7 +42,7 @@ function onTerminate(shutdown, options) {
       .then(() => exitSoon(code))
       .catch((err) => {
         Promise.resolve()
-          .then(() => onErrorTerminate(err))
+          .then(() => onError(err))
           .then(() => exitSoon(1))
           .catch(() => exitSoon(1));
       });
