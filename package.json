@@ -1,19 +1,15 @@
 {
   "name": "gracefully",
   "version": "1.0.2",
-  "description": "Utilities to stop a node server gracefully",
+  "description": "Stop a node server gracefully",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "test": "zUnit",
-    "precommit": "npm run lint",
-    "prepush": "npm run test"
+    "test": "zUnit"
   },
   "repository": "git@github.com:sithmel/gracefully.git",
   "author": "Maurizio Lupo <maurizio.lupo@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "husky": "^8.0.3",
     "zunit": "^4.0.2"
   }
 }

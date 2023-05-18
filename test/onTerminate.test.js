@@ -1,8 +1,6 @@
-import pkg from "zunit";
-import assert from "assert";
-import onTerminate from "../onTerminate.js";
-
-const { describe, it, beforeEach, afterEach } = pkg;
+const assert = require("assert");
+const { describe, it, beforeEach, afterEach } = require("zunit");
+const onTerminate = require("../index.js");
 
 describe("onTerminate", function () {
   const quickOpts = {
