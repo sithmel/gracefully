@@ -1,100 +1,102 @@
-/* eslint-env node, mocha */
-const onTerminate = require('../onTerminate')
-const assert = require('chai').assert
+import pkg from "zunit";
+import assert from "assert";
+import onTerminate from "../onTerminate.js";
 
-describe('onTerminate', function () {
+const { describe, it, beforeEach, afterEach } = pkg;
+
+describe("onTerminate", function () {
   const quickOpts = {
     exitDelay: 1,
     stopWindow: 5,
-    customEvent: 'custom-stop'
-  }
+    customEvent: "custom-stop",
+  };
 
-  let exit
-  let started
+  let exit;
+  let started;
 
   const shutdown = () =>
     new Promise((resolve) => {
       setTimeout(() => {
-        started = false
-        resolve()
-      }, 2)
-    })
+        started = false;
+        resolve();
+      }, 2);
+    });
 
   const shutdownLong = () =>
     new Promise((resolve) => {
       setTimeout(() => {
-        started = false
-        resolve()
-      }, 200)
-    })
+        started = false;
+        resolve();
+      }, 200);
+    });
 
   beforeEach(() => {
-    exit = process.exit
-    process.exitCode = undefined
-    started = true
-  })
+    exit = process.exit;
+    process.exitCode = undefined;
+    started = true;
+  });
 
   afterEach(() => {
-    process.removeAllListeners()
-    process.exit = exit
-  })
+    process.removeAllListeners();
+    process.exit = exit;
+  });
 
   describe("'custom-stop' handling", () => {
-    it('stops system gracefully', (done) => {
-      const requestedCode = 2
+    it("stops system gracefully", (done) => {
+      const requestedCode = 2;
 
       process.exit = function (code) {
-        assert.strictEqual(code, requestedCode)
-        assert(!started)
-        done()
-      }
+        assert.strictEqual(code, requestedCode);
+        assert(!started);
+        done();
+      };
 
-      onTerminate(shutdown, quickOpts)
-      process.emit('custom-stop', { code: requestedCode })
-    })
+      onTerminate(shutdown, quickOpts);
+      process.emit("custom-stop", { code: requestedCode });
+    });
 
-    it('terminates system when graceful shutdown fails', (done) => {
+    it("terminates system when graceful shutdown fails", (done) => {
       process.exit = function (code) {
-        assert.strictEqual(code, 1)
-        done()
-      }
+        assert.strictEqual(code, 1);
+        done();
+      };
 
-      onTerminate(() => Promise.reject(new Error('Boom!')), quickOpts)
-      process.emit('custom-stop', { code: 2 })
-    })
-  })
+      onTerminate(() => Promise.reject(new Error("Boom!")), quickOpts);
+      process.emit("custom-stop", { code: 2 });
+    });
+  });
 
-  Array.from(['SIGINT', 'SIGTERM']).forEach(function (signal) {
-    describe(signal + ' handling', function () {
-      it('stops system gracefully', (done) => {
+  Array.from(["SIGINT", "SIGTERM"]).forEach(function (signal) {
+    describe(signal + " handling", function () {
+      it("stops system gracefully", (done) => {
         process.exit = function (code) {
-          assert.isUndefined(code)
-          assert(!started)
-          done()
-        }
+          assert.isUndefined(code);
+          assert(!started);
+          done();
+        };
 
-        onTerminate(shutdown, quickOpts)
-        process.emit(signal)
-      })
+        onTerminate(shutdown, quickOpts);
+        process.emit(signal);
+      });
 
-      it('terminates system when not shut down gracefully in stop window', (done) => {
+      it("terminates system when not shut down gracefully in stop window", (done) => {
         process.exit = function (code) {
-          assert.isUndefined(code)
-          done()
-        }
+          assert.isUndefined(code);
+          done();
+        };
 
-        onTerminate(shutdownLong, quickOpts)
-        process.emit(signal)
-      })
+        onTerminate(shutdownLong, quickOpts);
+        process.emit(signal);
+      });
 
-      it('terminates system when graceful shutdown fails', (done) => {
+      it("terminates system when graceful shutdown fails", (done) => {
         process.exit = function (code) {
-          assert.strictEqual(code, 1)
-          done()
-        }
-        onTerminate(() => Promise.reject(new Error('Boom!')), quickOpts)
-        process.emit(signal)
-      })
-    })
-  })
-})
+          assert.strictEqual(code, 1);
+          done();
+        };
+        onTerminate(() => Promise.reject(new Error("Boom!")), quickOpts);
+        process.emit(signal);
+      });
+    });
+  });
+});

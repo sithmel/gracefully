@@ -1,7 +1,2 @@
-const onTerminate = require('./onTerminate')
-const Runner = require('./runner')
-
-module.exports = {
-  onTerminate,
-  Runner
-}
+export { onTerminate } from "./onTerminate.js";
+export { Runner } from "./runner.js";
