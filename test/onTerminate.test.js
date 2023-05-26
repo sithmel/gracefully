@@ -62,41 +62,6 @@ describe("onTerminate", function () {
       onTerminate(() => Promise.reject(new Error("Boom!")), quickOpts);
       process.emit("custom-stop", { code: 2 });
     });
-
-    it("calls onErrorTerminate", (_test, done) => {
-      let errorMessage;
-      process.exit = function (code) {
-        assert.equal(errorMessage, "Boom!");
-        assert.equal(code, 1);
-        done();
-      };
-
-      onTerminate(() => Promise.reject(new Error("Boom!")), {
-        ...quickOpts,
-        onError: (err) => (errorMessage = err.message),
-      });
-      process.emit("custom-stop", { code: 2 });
-    });
-
-    it("calls onBeforeTerminate", (_test, done) => {
-      let called = false;
-      const requestedCode = 2;
-
-      process.exit = function (code) {
-        assert.equal(called, true);
-        assert.equal(code, requestedCode);
-        assert(!started);
-        done();
-      };
-
-      onTerminate(shutdown, {
-        ...quickOpts,
-        onBeforeTerminate: () => {
-          called = true;
-        },
-      });
-      process.emit("custom-stop", { code: requestedCode });
-    });
   });
 
   Array.from(["SIGINT", "SIGTERM"]).forEach(function (signal) {

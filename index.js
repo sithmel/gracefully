@@ -3,8 +3,6 @@ const DEFAULTS = {
   stopWindow: 5000,
   customEvent: null,
   handleExceptions: false,
-  onBeforeTerminate: () => {},
-  onError: () => {},
 };
 
 function timeoutMessage(tm, message) {
@@ -14,14 +12,10 @@ function timeoutMessage(tm, message) {
 }
 
 function onTerminate(shutdown, options) {
-  const {
-    exitDelay,
-    stopWindow,
-    onError,
-    onBeforeTerminate,
-    customEvent,
-    handleExceptions,
-  } = { ...DEFAULTS, ...options };
+  const { exitDelay, stopWindow, customEvent, handleExceptions } = {
+    ...DEFAULTS,
+    ...options,
+  };
   const exitSoon = (code) => {
     setTimeout(() => process.exit(code), exitDelay).unref();
   };
@@ -37,14 +31,10 @@ function onTerminate(shutdown, options) {
     );
 
     return Promise.resolve()
-      .then(onBeforeTerminate)
       .then(() => Promise.race([shutdown(reason), timeoutFunction]))
       .then(() => exitSoon(code))
       .catch((err) => {
-        Promise.resolve()
-          .then(() => onError(err))
-          .then(() => exitSoon(1))
-          .catch(() => exitSoon(1));
+        Promise.resolve().then(() => exitSoon(1));
       });
   }
   // event handlers

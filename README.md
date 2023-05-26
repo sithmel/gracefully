@@ -14,8 +14,6 @@ gracefully(shutdown, options);
 
 - exitDelay (default 50): after shutting down I wait a certain amount of time before calling process.exit
 - stopWindow: (default: 5000): if the shutdown function takes more than this time, the process exit anyway
-- onBeforeTerminate: a function that is executed right before the shutdown function
-- onErrorTerminate: a function called when the shutdown function fails. It takes the error and can be used for logging.
 - customEvent (optional): onTerminate listen to this event (emitted by the process), to shutdown the process
 - handleExceptions ( default false): uncaughtException and unhandledRejection are handled in the same way.
 
