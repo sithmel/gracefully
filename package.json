@@ -4,12 +4,15 @@
   "description": "Stop a node server gracefully",
   "main": "index.js",
   "scripts": {
-    "test": "zUnit"
+    "test": "zUnit",
+    "types": "tsc"
   },
   "repository": "git@github.com:sithmel/gracefully.git",
   "author": "Maurizio Lupo <maurizio.lupo@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^20.5.9",
+    "typescript": "^5.2.2",
     "zunit": "^4.0.2"
   }
 }

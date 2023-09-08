@@ -1,3 +1,12 @@
+//@ts-check
+
+/**
+ * @typedef {object} Options
+ * @property {number} [exitDelay]
+ * @property {number} [stopWindow]
+ * @property {string} [customEvent]
+ * @property {boolean} [handleExceptions]
+ */
 const DEFAULTS = {
   exitDelay: 50,
   stopWindow: 5000,
@@ -5,21 +14,35 @@ const DEFAULTS = {
   handleExceptions: false,
 };
 
+/**
+ * @param {number} tm
+ * @param {string} message
+ * @return {Promise<string>}
+ */
 function timeoutMessage(tm, message) {
   return new Promise((resolve) => {
     setTimeout(() => resolve(message), tm).unref();
   });
 }
 
+/**
+ * @param {(args0: string) => Promise<void>} shutdown
+ * @param {Options} options
+ * @return {void}
+ */
 function onTerminate(shutdown, options) {
   const { exitDelay, stopWindow, customEvent, handleExceptions } = {
     ...DEFAULTS,
     ...options,
   };
-  const exitSoon = (code) => {
+  const exitSoon = (/** @type {number | undefined} */ code) => {
     setTimeout(() => process.exit(code), exitDelay).unref();
   };
 
+  /**
+   * @param {string} reason
+   * @param {number | undefined} [code]
+   */
   function _shutDownHandler(reason, code) {
     if (code != null) {
       process.exitCode = code;
@@ -38,6 +61,9 @@ function onTerminate(shutdown, options) {
       });
   }
   // event handlers
+  /**
+   * @param {{ code: any; }} payload
+   */
   function _stopListener(payload) {
     _shutDownHandler(`'${customEvent}'`, payload && payload.code);
   }
@@ -45,12 +71,18 @@ function onTerminate(shutdown, options) {
     _shutDownHandler("SIGINT");
   }
   function _sigtermListener() {
-    _shutDownHandler("SIGINT");
+    _shutDownHandler("SIGTERM");
   }
+  /**
+   * @param {Error} err
+   */
   function _uncaughtExceptionListener(err) {
     console.error(err);
     _shutDownHandler("uncaughtException", 1);
   }
+  /**
+   * @param {Error} err
+   */
   function _unhandledRejectionListener(err) {
     console.error(err);
     _shutDownHandler("unhandledRejection", 1);
