@@ -4,6 +4,7 @@ gracefully is a utility function that allow you to shutdown an application ... g
 
 ```js
 const gracefully = require("gracefully");
+// or use import, it includes typescript types!
 gracefully(shutdown, options);
 ```
 
@@ -12,7 +13,7 @@ gracefully(shutdown, options);
 
 ## Options:
 
-- exitDelay (default 50): after shutting down I wait a certain amount of time before calling process.exit
+- exitDelay (default 50): after shutting down, it waits a certain amount of time before calling process.exit
 - stopWindow: (default: 5000): if the shutdown function takes more than this time, the process exit anyway
 - customEvent (optional): onTerminate listen to this event (emitted by the process), to shutdown the process
 - handleExceptions ( default false): uncaughtException and unhandledRejection are handled in the same way.
